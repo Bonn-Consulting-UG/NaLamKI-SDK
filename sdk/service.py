@@ -32,7 +32,7 @@ class NaLamKIService:
         path = os.path.join(self.action_path, "input")
         input_files = []
         for file in os.listdir(path):
-            input_files.append(open(path + file, 'rb'))
+            input_files.append(open(os.path.join(path, file), 'rb'))
         return input_files
     
     def save_data(self, files):
