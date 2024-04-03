@@ -1,0 +1,23 @@
+[build-system]
+requires = ["setuptools"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "sdk"
+authors = [
+    {name = "Jannes Magnusson", email = "jannes.magnusson@hhi.fraunhofer.de"}
+]
+description = "SDK for NaLamKI Services"
+requires-python = ">=3.8"
+dynamic = ["version", "readme"]
+dependencies = [
+    "python-dotenv",
+    'pika',
+    'minio',
+    'UUID',
+    'jsonschema'
+]
+
+[tool.setuptools.dynamic]
+version = {attr = "sdk.__version__"}
+readme = {file = ["README.md"], content-type = "text/plain"}
