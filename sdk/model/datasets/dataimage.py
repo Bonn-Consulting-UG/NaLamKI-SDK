@@ -1,5 +1,7 @@
 from dataclasses import dataclass
 from sdk.model.datasets.dataset import Dataset
+from typing import List
+
 import uuid
 from datetime import datetime
 from .datavalue import DataValue
@@ -8,5 +10,5 @@ from sdk.model.annotations.bbox import BoundingBox
 
 @dataclass
 class Image(File):
-    bbox: BoundingBox = None
+    bbox: List[BoundingBox] = None
     

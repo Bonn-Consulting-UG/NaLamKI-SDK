@@ -9,7 +9,7 @@ class GeoFeature:
     type:str
     geometry: GeoGeometry
     id: uuid = None
-    property: List[GeoFeatureProperty] = None
+    property: GeoFeatureProperty = None
 
     def __post_init__(self):
         self.id = uuid.uuid4()

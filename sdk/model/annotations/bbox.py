@@ -6,6 +6,8 @@ class BoundingBox():
     y:int
     h:int
     w:int
+    color: str = None
     classification: str = None
+    label: str = None
     accuracy: int = None
     
