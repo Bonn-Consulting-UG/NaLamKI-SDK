@@ -1,7 +1,7 @@
+from typing import List
 from dataclasses import dataclass, field
 import uuid
-from sdk.model.datasets.dataset import Dataset
-from typing import List
+from ..datasets.dataset import Dataset
 
 @dataclass
 class GeoFeatureProperty:

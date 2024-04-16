@@ -2,10 +2,9 @@ import os
 import shutil
 import traceback
 
-from sdk.helper.rabbitmq import RabbitMQHelper 
-from sdk.helper.minio import MinIOHelper
+from .helper import RabbitMQHelper, MinIOHelper
 
-from sdk.model.action.action import *
+from .model.action import Action, S3Bucket
 
 prod_action_path    = os.path.join("action")
 test_action_path    = os.path.join("test","action")

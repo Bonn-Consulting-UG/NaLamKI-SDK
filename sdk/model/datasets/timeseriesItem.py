@@ -1,5 +1,5 @@
 from dataclasses import dataclass
-from sdk.model.datasets.dataset import Dataset
+from .dataset import Dataset
 from typing import List
 
 import uuid

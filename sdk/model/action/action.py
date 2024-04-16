@@ -2,7 +2,7 @@ from dataclasses import dataclass
 import dataclasses
 import json
 
-from sdk.model.encoder import NaLamKIDataEncoder
+from ..model.encoder import NaLamKIDataEncoder
 
 from .s3bucket import S3Bucket
 from .action_data import ActionData
