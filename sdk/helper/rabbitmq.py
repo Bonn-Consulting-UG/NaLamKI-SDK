@@ -51,11 +51,11 @@ class RabbitMQHelper:
         :param queue: name of the queue
         :param messag: message to be sent
         """
-        self.channel.queue_declare(queue)
+        self.channel.queue_declare(queue, durable=True)
         self.channel.basic_publish(exchange='', routing_key = queue, body=messag)
 
     def get_message(self, queue):
-        method_frame, header_frame, body = self.channel.basic_get('test')
+        method_frame, header_frame, body = self.channel.basic_get(queue)
         if method_frame:
             print(method_frame, header_frame, body)
             self.channel.basic_ack(method_frame.delivery_tag)

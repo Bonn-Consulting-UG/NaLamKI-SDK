@@ -71,9 +71,9 @@ class NaLamKIService:
         Excecute Service for Action. 
         '''
         # Create temp Action directory and download files
-        #  if os.path.exists(self.action_path):
-        #     self.delete_action_dir()
-        self.delete_action_content()
+        if os.path.exists(self.action_path):
+           self.delete_action_content()
+        # self.delete_action_content()
         self.create_action_content()
         self.get_action_data(action)
         # Do the calculation
@@ -93,8 +93,12 @@ class NaLamKIService:
 
 
     def run(self):
-        self.rmq = RabbitMQHelper(os.getenv('MQTT_HOST'), os.getenv('MQTT_PORT'), os.getenv('MQTT_ROUTING_KEY'), os.getenv('MQTT_USERNAME'), os.getenv('MQTT_Password'))
-        self.rmq.listen(os.getenv('MQTT_QUEUE'), self.on_message)
+        while True:
+            try:
+                self.rmq = RabbitMQHelper(os.getenv('MQTT_HOST'), os.getenv('MQTT_PORT'), os.getenv('MQTT_ROUTING_KEY'), os.getenv('MQTT_USERNAME'), os.getenv('MQTT_Password'))
+                self.rmq.listen(os.getenv('MQTT_QUEUE'), self.on_message)
+            except Exception as e:
+                print("Error: %s : %s" % (e.strerror))
 
     def create_action_content(self):
         '''
