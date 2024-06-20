@@ -134,7 +134,7 @@ class NaLamKIService:
                 files.append(inputFile)
 
         for file in files:
-            self.s3.download_File(file, os.path.join(self.action_path, "input") + os.path.basename(file))
+            self.s3.download_File(file, os.path.join(self.action_path, "input", os.path.basename(file)))
     
     def upload_action_data(self, action:Action):
         '''
