@@ -29,6 +29,7 @@ class RabbitMQHelper:
             self.connection_paramters = pika.ConnectionParameters(endpoint,port,"/",self.credentials_intern)
             self.connection = pika.BlockingConnection(self.connection_paramters)
             self.channel = self.connection.channel()
+            self.channel.queue_declare(routing_key,durable=True)
             self.logger.debug("Connection to RabbitMQ successful.")
         except Exception as exp:
             self.logger.error(f"Connection error to RabbitMQ. \n Message: {exp}")
@@ -51,7 +52,6 @@ class RabbitMQHelper:
         :param queue: name of the queue
         :param messag: message to be sent
         """
-        # self.channel.queue_declare(queue)
         self.channel.basic_publish(exchange='', routing_key = queue, body=messag)
 
     def get_message(self, queue):
