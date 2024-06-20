@@ -100,7 +100,7 @@ class NaLamKIService:
         '''
         Create required Action Directory for current run.
         '''
-        # os.makedirs(self.action_path, exist_ok=True)
+        os.makedirs(self.action_path, exist_ok=True)
         os.makedirs(os.path.join(self.action_path, "input"), exist_ok=True)
         os.makedirs(os.path.join(self.action_path, "output"), exist_ok=True)
 
