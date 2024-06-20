@@ -55,7 +55,7 @@ class RabbitMQHelper:
         self.channel.basic_publish(exchange='', routing_key = queue, body=messag)
 
     def get_message(self, queue):
-        method_frame, header_frame, body = self.channel.basic_get(queue)
+        method_frame, header_frame, body = self.channel.basic_get('test')
         if method_frame:
             print(method_frame, header_frame, body)
             self.channel.basic_ack(method_frame.delivery_tag)
