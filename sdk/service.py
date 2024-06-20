@@ -2,10 +2,12 @@ import os
 import shutil
 import traceback
 import json
+import dataclasses
 
 from .helper import RabbitMQHelper, MinIOHelper
 
 from .model.action import Action, S3Bucket
+from .model.encoder import NaLamKIDataEncoder
 
 prod_action_path    = os.path.join("action")
 test_action_path    = os.path.join("test","action")
