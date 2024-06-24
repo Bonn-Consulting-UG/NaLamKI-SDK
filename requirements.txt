@@ -1,6 +1,5 @@
 python-dotenv
 pika
-paho-mqtt
 minio
 UUID
 jsonschema
