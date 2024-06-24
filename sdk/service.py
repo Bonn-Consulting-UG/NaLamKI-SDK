@@ -18,7 +18,7 @@ class NaLamKIService:
         self.model = self.init_model()
         self.s3 = None
         self.action_path = prod_action_path
-        self.rmq = None
+        self.rmq = RabbitMQHelper(os.getenv('MQTT_HOST'), os.getenv('MQTT_PORT'), os.getenv('MQTT_USERNAME'), os.getenv('MQTT_Password'), os.getenv('MQTT_QUEUE'))
 
     def init_model(self):
         '''
@@ -49,7 +49,7 @@ class NaLamKIService:
     def process_data(self):
         pass
 
-    def on_message(self, channel, method_frame, header_frame, body):
+    def on_message(self, ch, method, properties, body):
         '''
         On revice message parse message and do actions. 
         '''
@@ -57,14 +57,14 @@ class NaLamKIService:
             action = Action.from_json(body)
             if action.pattern == "start":
                 self.do_action(action=action)
-                channel.basic_ack(delivery_tag=method_frame.delivery_tag)
+                # channel.basic_ack(delivery_tag=method_frame.delivery_tag)
         except Exception as error:
             print("ERROR: MQTT Message cannot be executed")
             print(error)
             traceback.print_exc() 
             print(body)
             self.rmq.write_message(json.dumps(dataclasses.asdict(Action(pattern="ERROR", data=None)), cls=NaLamKIDataEncoder))
-            channel.basic_ack(delivery_tag=method_frame.delivery_tag)
+            # channel.basic_ack(delivery_tag=method_frame.delivery_tag)
 
     def do_action(self, action:Action):
         '''
@@ -95,7 +95,6 @@ class NaLamKIService:
     def run(self):
         while True:
             try:
-                self.rmq = RabbitMQHelper(os.getenv('MQTT_HOST'), os.getenv('MQTT_PORT'), os.getenv('MQTT_USERNAME'), os.getenv('MQTT_Password'), os.getenv('MQTT_QUEUE'))
                 self.rmq.listen(self.on_message)
             except Exception as e:
                 print("Error: %s : %s" % (e.strerror))
