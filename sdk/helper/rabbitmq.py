@@ -26,6 +26,7 @@ class RabbitMQHelper:
         self.channel = self.connection.channel()
         # Declare the queue (if it doesn't already exist)
         self.channel.queue_declare(queue=queue, durable=True)
+        print("MQTT Client Ready initialized")
 
 
     def write_message(self, message):
@@ -65,8 +66,8 @@ class RabbitMQHelper:
         self.channel.basic_consume(
             queue=self.queue,
             on_message_callback = method if method == None else self.on_message,
-            auto_ack=True
+            auto_ack=False
         )
 
-        print(f"Waiting for messages in {self.queue}. To exit press CTRL+C")
+        print(f"Waiting for messages in {self.queue}.")
         self.channel.start_consuming()
