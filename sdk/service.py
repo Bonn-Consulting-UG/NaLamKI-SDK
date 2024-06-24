@@ -63,7 +63,7 @@ class NaLamKIService:
             print(error)
             traceback.print_exc() 
             print(body)
-            self.rmq.write_message(os.getenv('MQTT_QUEUE'), json.dumps(dataclasses.asdict(Action(pattern="ERROR", data=None)), cls=NaLamKIDataEncoder))
+            self.rmq.write_message(json.dumps(dataclasses.asdict(Action(pattern="ERROR", data=None)), cls=NaLamKIDataEncoder))
             channel.basic_ack(delivery_tag=method_frame.delivery_tag)
 
     def do_action(self, action:Action):
@@ -95,8 +95,8 @@ class NaLamKIService:
     def run(self):
         while True:
             try:
-                self.rmq = RabbitMQHelper(os.getenv('MQTT_HOST'), os.getenv('MQTT_PORT'), os.getenv('MQTT_ROUTING_KEY'), os.getenv('MQTT_USERNAME'), os.getenv('MQTT_Password'))
-                self.rmq.listen(os.getenv('MQTT_QUEUE'), self.on_message)
+                self.rmq = RabbitMQHelper(os.getenv('MQTT_HOST'), os.getenv('MQTT_PORT'), os.getenv('MQTT_USERNAME'), os.getenv('MQTT_Password'), os.getenv('MQTT_QUEUE'))
+                self.rmq.listen(self.on_message)
             except Exception as e:
                 print("Error: %s : %s" % (e.strerror))
 
@@ -148,10 +148,10 @@ class NaLamKIService:
         print('EMIT FINISH')
         action.pattern = "finish"
         print(json.dumps(dataclasses.asdict(action)))
-        self.rmq.write_message(os.getenv('MQTT_QUEUE'), json.dumps(dataclasses.asdict(action), cls=NaLamKIDataEncoder))
+        self.rmq.write_message(json.dumps(dataclasses.asdict(action), cls=NaLamKIDataEncoder))
 
     def send_test_message(self):
         action = Action("start", S3Bucket(endpoint=os.getenv('S3_HOST'), port=os.getenv('S3_PORT'), name="nalamki", accessId=os.getenv('S3_ACCESS_ID'), accessToken=os.getenv('S3_ACCESS_TOKEN')), inputData=["action/input"], outputData="action/output")
-        self.rmq.write_message(os.getenv('MQTT_QUEUE'), json.dumps(dataclasses.asdict(action), cls=NaLamKIDataEncoder))
+        self.rmq.write_message(json.dumps(dataclasses.asdict(action), cls=NaLamKIDataEncoder))
 
 

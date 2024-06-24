@@ -1,94 +1,72 @@
-import paho.mqtt.client as mqtt
-import logging
-import os
+import pika
+import pika.credentials
 
 class RabbitMQHelper:
 
-    """
-    Helper class for establishing connection to MQTT broker. 
 
-    A request/reply pattern is implemented.
-    """
-
-    def __init__(self, endpoint: str, port: int, topic: str, username: str, password: str, path: str = "") -> None:
+    def __init__(self, endpoint: str, port: int, username: str, password: str, queue: str) -> None:
         """
         Connection setup for MQTT broker.
 
         :param endpoint: endpoint to MQTT broker
         :param port: port of the endpoint 
-        :param topic: the topic for sending the message
         :param username: username for MQTT broker
         :param password: password for MQTT broker
-        :param path: path for message storage (if needed)
+        :param queue: queue for MQTT broker
         """
 
-        logging.basicConfig(format='%(asctime)s - %(message)s')
-        self.logger = logging.getLogger(__name__)
-        self.logger.setLevel(logging.ERROR)
+        self.queue = queue
 
-        self.client = mqtt.Client()
-        self.client.username_pw_set(username, password)
-        self.client.on_connect = self.on_connect
-        self.client.on_message = self.on_message
+        credentials = pika.PlainCredentials(username, password)
 
-        try:
-            self.client.connect(endpoint, port, 60)
-            self.logger.debug("Connection to MQTT broker successful.")
-        except Exception as exp:
-            self.logger.error(f"Connection error to MQTT broker. \nMessage: {exp}")
+        self.connection = pika.BlockingConnection(pika.ConnectionParameters(host=endpoint, 
+                                                               port=port, 
+                                                               credentials=credentials
+                                                               ))
+        self.channel = self.connection.channel()
+        # Declare the queue (if it doesn't already exist)
+        self.channel.queue_declare(queue=queue, durable=True)
 
-        self.topic = topic
-        self.sending_message_back = True
-        self.path = path
-        self.message = None 
 
-    def check_and_create_path(self):
-        if not os.path.exists(self.path):
-            os.makedirs(self.path)
-
-    def write_message(self, topic, message):
+    def write_message(self, message):
         """
-        Sends/writes a message on the topic.
-
-        :param topic: name of the topic
+        Sends/writes a message on Queue.
         :param message: message to be sent
         """
-        self.client.publish(topic, message)
+        self.channel.basic_publish(
+            exchange='',
+            routing_key=self.queue,
+            body=message
+        )
 
-    def get_message(self, topic):
+    # def get_message(self, topic):
+    #     """
+    #     Subscribes to a topic and prints the message received.
+    #     :param topic: name of the topic
+    #     """
+    #     self.client.subscribe(topic)
+    #     self.client.loop_start()
+
+    # def on_connect(self, client, userdata, flags, rc):
+    #     if rc == 0:
+    #         self.logger.debug("Connected to MQTT broker successfully.")
+    #     else:
+    #         self.logger.error(f"Connection failed with code {rc}.")
+
+    def on_message(self, ch, method, properties, body):
+        print(f"Received message: {body}")
+
+    def listen(self, method=None):
         """
-        Subscribes to a topic and prints the message received.
-        
-        :param topic: name of the topic
-        """
-        self.client.subscribe(topic)
-        self.client.loop_start()
-
-    def on_connect(self, client, userdata, flags, rc):
-        if rc == 0:
-            self.logger.debug("Connected to MQTT broker successfully.")
-        else:
-            self.logger.error(f"Connection failed with code {rc}.")
-
-    def on_message(self, client, userdata, msg):
-        print(f"Received message: {msg.payload.decode()} on topic {msg.topic}")
-
-    def listen(self, topic, method=None):
-        """
-        Listens for messages on a topic.
-
-        :param topic: name of the topic
+        Listens for messages.
         :param method: method to handle the message (default is self.on_message)
         """
-        self.client.subscribe(topic)
-        if method is None:
-            self.client.on_message = self.on_message
-        else:
-            self.client.on_message = method
-        self.client.loop_forever()
+        # Set up subscription on the queue
+        self.channel.basic_consume(
+            queue=self.queue,
+            on_message_callback = method if method == None else self.on_message,
+            auto_ack=True
+        )
 
-# Beispiel der Nutzung
-# mqtt_helper = MQTTClientHelper(endpoint="mqtt.example.com", port=1883, topic="test/topic", username="user", password="pass")
-# mqtt_helper.write_message("test/topic", "Hello MQTT")
-# mqtt_helper.get_message("test/topic")
-# mqtt_helper.listen("test/topic")
+        print(f"Waiting for messages in {self.queue}. To exit press CTRL+C")
+        self.channel.start_consuming()
