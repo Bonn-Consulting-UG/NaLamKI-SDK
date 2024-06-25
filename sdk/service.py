@@ -57,14 +57,14 @@ class NaLamKIService:
             action = Action.from_json(body)
             if action.pattern == "start":
                 self.do_action(action=action)
-                ch.basic_ack(delivery_tag=method_frame.delivery_tag)
+                ch.basic_ack(delivery_tag=method.delivery_tag)
         except Exception as error:
             print("ERROR: MQTT Message cannot be executed")
             print(error)
             traceback.print_exc() 
             print(body)
             self.rmq.write_message(json.dumps(dataclasses.asdict(Action(pattern="ERROR", data=None)), cls=NaLamKIDataEncoder))
-            ch.basic_ack(delivery_tag=method_frame.delivery_tag)
+            ch.basic_ack(delivery_tag=method.delivery_tag)
 
     def do_action(self, action:Action):
         '''
