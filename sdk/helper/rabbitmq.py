@@ -65,7 +65,7 @@ class RabbitMQHelper:
         # Set up subscription on the queue
         self.channel.basic_consume(
             queue=self.queue,
-            on_message_callback = method if method == None else self.on_message,
+            on_message_callback = method if method is not None else self.on_message,
             auto_ack=False
         )
 

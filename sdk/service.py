@@ -94,12 +94,12 @@ class NaLamKIService:
 
     def run(self):
         while True:
-            try:
-                print("Service Loop started")
-                self.rmq.listen(self.on_message)
-            except Exception as e:
-                print("Error: %s : %s" % (e.strerror))
-            print("Ooups an error occured")
+            # try:
+            print("Service Loop started")
+            self.rmq.listen(self.on_message)
+            # except Exception as e:
+            #     print("Error: %s : %s" % (e.strerror))
+            # print("Ooups an error occured")
 
     def create_action_content(self):
         '''
