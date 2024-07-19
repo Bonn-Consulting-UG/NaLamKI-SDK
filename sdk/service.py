@@ -150,9 +150,3 @@ class NaLamKIService:
         action.pattern = "finish"
         print(json.dumps(dataclasses.asdict(action)))
         self.rmq.write_message(json.dumps(dataclasses.asdict(action), cls=NaLamKIDataEncoder))
-
-    def send_test_message(self):
-        action = Action("start", S3Bucket(endpoint=os.getenv('S3_HOST'), port=os.getenv('S3_PORT'), name="nalamki", accessId=os.getenv('S3_ACCESS_ID'), accessToken=os.getenv('S3_ACCESS_TOKEN')), inputData=["action/input"], outputData="action/output")
-        self.rmq.write_message(json.dumps(dataclasses.asdict(action), cls=NaLamKIDataEncoder))
-
-
